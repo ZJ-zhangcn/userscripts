@@ -27,6 +27,14 @@ Tampermonkey 会自动识别并弹出安装页面。
 - Cmd/Ctrl/Shift + 左键：后台打开，新标签位于标签栏最后。
 - 鼠标中键：后台打开，新标签位于标签栏最后。
 
+## LDStatus Pro 修正版
+
+基于上游 LDStatusPro 的个人修正版，重点修复：已显示登录但数据可能来自旧缓存，重新登录后才刷新的问题。
+
+Raw 安装地址：
+
+<https://raw.githubusercontent.com/ZJ-zhangcn/userscripts/main/LDStatusPro.user.js>
+
 ## License
 
 MIT
