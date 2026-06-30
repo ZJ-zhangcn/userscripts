@@ -1,8 +1,8 @@
 // ==UserScript==
 // @name         LDStatus Pro
 // @namespace    http://tampermonkey.net/
-// @version      3.9.0.3-zj.1
-// @description  在 Linux.do 和 IDCFlare 页面显示信任级别进度，支持历史趋势、里程碑通知、阅读时间统计、排行榜系统、我的活动查看。两站点均支持排行榜和云同步功能（ZJ 修正版：登录态刷新后主动清缓存）
+// @version      3.9.0.3-zj.2
+// @description  在 Linux.do 和 IDCFlare 页面显示信任级别进度，支持历史趋势、里程碑通知、阅读时间统计、排行榜系统、我的活动查看。两站点均支持排行榜和云同步功能（ZJ 修正版：显示数据来源/更新时间，手动刷新更彻底清缓存）
 // @author       JackLiii
 // @license      MIT
 // @match        https://linux.do/*
@@ -3018,6 +3018,19 @@
             // 手动刷新冷却时间 5 分钟
             static MANUAL_REFRESH_COOLDOWN = 5 * 60 * 1000;
 
+            _withMeta(data, meta = {}) {
+                if (!data || typeof data !== 'object') return data;
+                return {
+                    ...data,
+                    _ldspMeta: {
+                        source: meta.source || 'network',
+                        updatedAt: meta.updatedAt || Date.now(),
+                        cacheAge: Math.max(0, Date.now() - (meta.updatedAt || Date.now())),
+                        error: meta.error || ''
+                    }
+                };
+            }
+
             async getLeaderboard(type = 'daily') {
                 const key = `lb_${type}`;
                 const cached = this.cache.get(key);
@@ -3029,7 +3042,9 @@
                 };
                 const ttl = ttlMap[type] || CONFIG.CACHE.LEADERBOARD_DAILY_TTL;
 
-                if (cached && (now - cached.time) < ttl) return cached.data;
+                if (cached && (now - cached.time) < ttl) {
+                    return this._withMeta(cached.data, { source: 'memory-cache', updatedAt: cached.time });
+                }
 
                 try {
                     // oauth.api() 内置登录检查，未登录时返回 { success: false }
@@ -3040,12 +3055,13 @@
                             period: result.data.period,
                             myRank: result.data.myRank
                         };
-                        this.cache.set(key, { data, time: now });
-                        return data;
+                        const freshData = this._withMeta(data, { source: 'network', updatedAt: now });
+                        this.cache.set(key, { data: freshData, time: now });
+                        return freshData;
                     }
                     throw new Error(result.error || '获取排行榜失败');
                 } catch (e) {
-                    if (cached) return cached.data;
+                    if (cached) return this._withMeta(cached.data, { source: 'fallback-cache', updatedAt: cached.time, error: e.message || String(e) });
                     throw e;
                 }
             }
@@ -3061,6 +3077,9 @@
                     throw new Error('刷新冷却中，请稍后再试');
                 }
 
+                // 手动强制刷新不复用旧排行榜缓存，避免失败后 UI 误以为数据已更新
+                this.cache.delete(key);
+
                 const result = await this.oauth.api(`/api/leaderboard/${type}`);
                 if (result.success) {
                     const data = {
@@ -3068,9 +3087,10 @@
                         period: result.data.period,
                         myRank: result.data.myRank
                     };
-                    this.cache.set(key, { data, time: now });
+                    const freshData = this._withMeta(data, { source: 'network', updatedAt: now });
+                    this.cache.set(key, { data: freshData, time: now });
                     this._manualRefreshTime.set(type, now);
-                    return { data, fromCache: false };
+                    return { data: freshData, fromCache: false };
                 }
                 throw new Error(result.error?.message || result.error || '获取排行榜失败');
             }
@@ -4245,6 +4265,10 @@
     .ldsp-ring.complete.anim-done .ldsp-confetti-piece{animation:confetti-burst 2s cubic-bezier(.15,.8,.3,1) forwards}
     @keyframes confetti-burst{0%{opacity:1;transform:translate(-50%,-50%) scale(0)}5%{opacity:1;transform:translate(-50%,-50%) scale(1.5)}25%{opacity:1;transform:translate(calc(var(--tx) * 1.2),calc(var(--ty) * 1.2)) rotate(calc(var(--rot) * 0.4)) scale(1.1)}100%{opacity:0;transform:translate(calc(var(--tx) + var(--drift)),calc(var(--ty) + 110px)) rotate(var(--rot)) scale(0.2)}}
     .ldsp-ring-tip{font-size:11px;text-align:center;margin:12px 0 16px;padding:8px 14px;border-radius:20px;font-weight:600;letter-spacing:.02em}
+    .ldsp-data-meta{display:flex;align-items:center;justify-content:center;gap:8px;flex-wrap:wrap;margin:0 0 8px;padding:6px 10px;border-radius:14px;background:linear-gradient(135deg,rgba(107,140,239,.08),rgba(91,181,166,.06));border:1px solid rgba(107,140,239,.18);color:var(--txt-mut);font-size:9px;font-weight:600;line-height:1.35}
+    .ldsp-data-meta span{white-space:nowrap}
+    .ldsp-data-meta.warn{background:linear-gradient(135deg,rgba(251,191,36,.12),rgba(249,115,22,.08));border-color:rgba(251,191,36,.26);color:var(--warn)}
+    .ldsp-data-meta-error{max-width:100%;overflow:hidden;text-overflow:ellipsis}
     .ldsp-ring-tip.ok{color:var(--ok);background:linear-gradient(135deg,var(--ok-bg),rgba(16,185,129,.05));border:1px solid rgba(16,185,129,.2)}
     .ldsp-ring-tip.progress{color:var(--accent);background:linear-gradient(135deg,rgba(107,140,239,.1),rgba(6,182,212,.05));border:1px solid rgba(107,140,239,.2)}
     .ldsp-ring-tip.max{color:var(--warn);background:linear-gradient(135deg,rgba(251,191,36,.1),rgba(249,115,22,.05));border:1px solid rgba(251,191,36,.25)}
@@ -10517,7 +10541,30 @@ a:hover{text-decoration:underline;}
                 }
             }
 
-            renderReqs(reqs, level = null) {
+            _formatDataMeta(meta = {}) {
+                const sourceLabels = {
+                    network: '实时数据',
+                    'memory-cache': '内存缓存',
+                    'fallback-cache': '缓存兜底',
+                    summary: '论坛统计',
+                    cloud: '云端同步',
+                    local: '本地数据'
+                };
+                const source = sourceLabels[meta.source] || meta.source || '数据';
+                const updatedAt = meta.updatedAt ? Utils.formatDate(meta.updatedAt, 'time') : Utils.formatDate(Date.now(), 'time');
+                const age = meta.updatedAt ? Math.max(0, Date.now() - meta.updatedAt) : 0;
+                const ageText = age < 60000 ? '刚刚' : age < 3600000 ? `${Math.floor(age / 60000)}分钟前` : `${Math.floor(age / 3600000)}小时前`;
+                const error = meta.error ? ` · ${Utils.escapeHtml(Utils.sanitize(meta.error, 80))}` : '';
+                const staleClass = meta.source === 'fallback-cache' ? ' warn' : '';
+                return { source, updatedAt, ageText, error, staleClass };
+            }
+
+            _renderDataMeta(meta = {}) {
+                const info = this._formatDataMeta(meta);
+                return `<div class="ldsp-data-meta${info.staleClass}" title="数据来源：${Utils.escapeHtml(info.source)}；更新时间：${info.updatedAt}${info.error}"><span>📡 ${Utils.escapeHtml(info.source)}</span><span>🕒 ${info.updatedAt} · ${info.ageText}</span>${info.error ? `<span class="ldsp-data-meta-error">${info.error}</span>` : ''}</div>`;
+            }
+
+            renderReqs(reqs, level = null, meta = null) {
                 const done = reqs.filter(r => r.isSuccess).length, remain = reqs.length - done;
                 const pct = Math.round(done / reqs.length * 100), cfg = Screen.getConfig();
                 const r = cfg.ringSize / 2 - 8, circ = 2 * Math.PI * r, off = circ * (1 - pct / 100);
@@ -10539,7 +10586,9 @@ a:hover{text-decoration:underline;}
                 const shapes = '●■★❤✨❀';
                 const confetti = pct === 100 ? Array.from({length:28},(_,i)=>{const a=(i/28)*360+(Math.random()-.5)*25,rad=a*Math.PI/180,d=55+Math.random()*45;return`<span class="ldsp-confetti-piece" style="color:${colors[i%8]};--tx:${Math.cos(rad)*d}px;--ty:${Math.sin(rad)*d*.7}px;--drift:${(Math.random()-.5)*40}px;--rot:${(Math.random()-.5)*900}deg;animation-delay:${Math.random()*.06}s">${shapes[Math.floor(Math.random()*6)]}</span>`}).join('') : '';
 
-                const h = [`<div class="ldsp-ring${pct===100?' complete':''}">`, pct===100?`<div class="ldsp-confetti">${confetti}</div>`:''];
+                const h = [];
+                if (meta) h.push(this._renderDataMeta(meta));
+                h.push(`<div class="ldsp-ring${pct===100?' complete':''}">`, pct===100?`<div class="ldsp-confetti">${confetti}</div>`:'');
                 h.push(`<div class="ldsp-ring-stat"><div class="ldsp-ring-stat-val ok">✓${done}</div><div class="ldsp-ring-stat-lbl">已达标</div></div>`,
                     `<div class="ldsp-ring-center"><div class="ldsp-ring-wrap"><svg width="${cfg.ringSize}" height="${cfg.ringSize}" viewBox="0 0 ${cfg.ringSize} ${cfg.ringSize}"><defs><linearGradient id="ldsp-grad" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" style="stop-color:#5070d0"/><stop offset="100%" style="stop-color:#5bb5a6"/></linearGradient></defs><circle class="ldsp-ring-bg" cx="${cfg.ringSize/2}" cy="${cfg.ringSize/2}" r="${r}"/><circle class="ldsp-ring-fill${anim?' anim':''}" cx="${cfg.ringSize/2}" cy="${cfg.ringSize/2}" r="${r}" stroke-dasharray="${circ}" stroke-dashoffset="${anim?circ:off}" style="--circ:${circ};--off:${off}"/></svg><div class="ldsp-ring-txt"><div class="ldsp-ring-val${anim?' anim':''}">${pct}%</div><div class="ldsp-ring-lbl">完成度</div></div></div><div class="ldsp-ring-lvl lv${lv}">${canUp?`Lv${lv} → Lv${tgt}`:`Lv${lv} ★`}</div></div>`,
                     `<div class="ldsp-ring-stat"><div class="ldsp-ring-stat-val fail">○${remain}</div><div class="ldsp-ring-stat-lbl">待完成</div></div></div>`,
@@ -10993,7 +11042,8 @@ a:hover{text-decoration:underline;}
                 const fmtInt = ms => { const m = Math.round(ms/60000); return m < 60 ? `每 ${m} 分钟更新` : `每 ${Math.round(m/60)} 小时更新`; };
                 const rules = { daily: fmtInt(CONFIG.CACHE.LEADERBOARD_DAILY_TTL), weekly: fmtInt(CONFIG.CACHE.LEADERBOARD_WEEKLY_TTL), monthly: fmtInt(CONFIG.CACHE.LEADERBOARD_MONTHLY_TTL) };
                 if (!data?.rankings?.length) return `<div class="ldsp-lb-empty"><div class="ldsp-lb-empty-icon">📭</div><div class="ldsp-lb-empty-txt">暂无排行数据<br>成为第一个上榜的人吧！</div></div>`;
-                let h = `<div class="ldsp-lb-period"><button class="ldsp-lb-refresh" data-type="${type}" title="手动刷新">🔄</button>${data.period?`📅 统计周期: <span>${data.period}</span>`:''}<span class="ldsp-update-rule">🔄 ${rules[type]}</span></div>`;
+                const metaHtml = data._ldspMeta ? this._renderDataMeta(data._ldspMeta) : '';
+                let h = `${metaHtml}<div class="ldsp-lb-period"><button class="ldsp-lb-refresh" data-type="${type}" title="手动刷新">🔄</button>${data.period?`📅 统计周期: <span>${data.period}</span>`:''}<span class="ldsp-update-rule">🔄 ${rules[type]}</span></div>`;
                 if (data.myRank && joined) h += `<div class="ldsp-my-rank${data.myRank.in_top?'':' not-in-top'}"><div><div class="ldsp-my-rank-lbl">我的排名${data.myRank.in_top?'':'<span class="ldsp-not-in-top-hint">（未入榜）</span>'}</div><div class="ldsp-my-rank-val">${data.myRank.rank?`#${data.myRank.rank}`:(data.myRank.rank_display||'--')}</div></div><div class="ldsp-my-rank-time">${Utils.formatReadingTime(data.myRank.minutes)}</div></div>`;
                 h += '<div class="ldsp-rank-list">';
                 const base = `https://${CURRENT_SITE.domain}`;
@@ -11854,6 +11904,7 @@ a:hover{text-decoration:underline;}
                 this.animRing = true;
                 this.cachedHistory = [];
                 this.cachedReqs = [];
+                this._lastReqsMeta = null;
                 this._cloudReqsCache = null;
                 this._cloudReqsCacheTime = 0;
                 this._cloudReqsFailUntil = 0;
@@ -12005,6 +12056,14 @@ a:hover{text-decoration:underline;}
                 this._cloudReqsCache = null;
                 this._cloudReqsCacheTime = 0;
                 this._cloudReqsFailUntil = 0;
+            }
+
+            _prepareForceRefresh() {
+                this._clearCloudRequirementsCache();
+                this.leaderboard?.clearCache();
+                this.network?.clearApiCache?.();
+                this._lastReqsMeta = null;
+                this._ssoHandled = false;
             }
 
             // 初始化云服务
@@ -12632,9 +12691,9 @@ a:hover{text-decoration:underline;}
                     if (this.loading) return;
                     this.animRing = true;
                     this._ssoHandled = false;
-                    this.fetch();
+                    this.fetch({ forceRefresh: true });
                     // 刷新数据时同步检查未读工单
-                    this.ticketManager?._checkUnread();
+                    this.ticketManager?._checkUnread(true);
                 });
 
                 this.$.btnSettings?.addEventListener('click', e => {
@@ -12965,7 +13024,7 @@ a:hover{text-decoration:underline;}
 
                         if (tab.dataset.tab === 'reqs') {
                             this.animRing = true;
-                            this.cachedReqs.length && this.renderer.renderReqs(this.cachedReqs);
+                            this.cachedReqs.length && this.renderer.renderReqs(this.cachedReqs, null, this._lastReqsMeta || { source: 'memory-cache', updatedAt: Date.now() });
                         } else if (tab.dataset.tab === 'trends') {
                             this._updateSubtabIndicator(this.$.trends);
                         } else if (tab.dataset.tab === 'leaderboard') {
@@ -13678,7 +13737,7 @@ a:hover{text-decoration:underline;}
             _refreshReqsFromCache() {
                 if (!this.cachedReqs.length) return;
                 this.animRing = true;
-                this.renderer.renderReqs(this.cachedReqs);
+                this.renderer.renderReqs(this.cachedReqs, null, this._lastReqsMeta || { source: 'memory-cache', updatedAt: Date.now() });
             }
 
             _showSettingsMenu() {
@@ -14164,7 +14223,7 @@ a:hover{text-decoration:underline;}
                     if (!willCollapse) {
                         this._hideIndicators();
                         this.animRing = true;
-                        this.cachedReqs.length && setTimeout(() => this.renderer.renderReqs(this.cachedReqs), 100);
+                        this.cachedReqs.length && setTimeout(() => this.renderer.renderReqs(this.cachedReqs, null, this._lastReqsMeta || { source: 'memory-cache', updatedAt: Date.now() }), 100);
                         setTimeout(() => this._resumeAnnouncements(), 260);
                     }
 
@@ -14323,9 +14382,12 @@ a:hover{text-decoration:underline;}
                 this.$.btnRefresh.style.animation = v ? 'spin 1s linear infinite' : '';
             }
 
-            async fetch() {
+            async fetch({ forceRefresh = false } = {}) {
                 if (this.loading) return;
-                console.log('[LDSP] fetch() 开始, url:', CURRENT_SITE.apiUrl);
+                console.log('[LDSP] fetch() 开始, url:', CURRENT_SITE.apiUrl, 'forceRefresh:', forceRefresh);
+                if (forceRefresh) this._prepareForceRefresh();
+                const fetchStartedAt = Date.now();
+                const dataMeta = { source: 'network', updatedAt: fetchStartedAt };
                 this._setLoading(true);
                 this.$.reqs.innerHTML = `<div class="ldsp-loading"><div class="ldsp-spinner"></div><div>加载中...</div></div>`;
 
@@ -14355,7 +14417,7 @@ a:hover{text-decoration:underline;}
                         throw new Error('无法获取数据');
                     }
 
-                    await this._parse(html);
+                    await this._parse(html, dataMeta);
                 } catch (e) {
                     console.log('[LDSP] fetch() 异常:', e.message || e);
                     // v3.5.2.9: 使用统一的错误格式化
@@ -14432,7 +14494,7 @@ a:hover{text-decoration:underline;}
 
             // 当没有升级要求表格时显示备选内容
             // 优先级：1. 服务端同步的数据 2. summary API 数据
-            async _showFallbackStats(username, level) {
+            async _showFallbackStats(username, level, dataMeta = { source: 'summary', updatedAt: Date.now() }) {
                 console.log('[LDSP] _showFallbackStats 触发, username:', username, 'level:', level);
                 const $ = this.$;
                 
@@ -14489,7 +14551,7 @@ a:hover{text-decoration:underline;}
                     this.$.reqs.innerHTML = `<div class="ldsp-loading"><div class="ldsp-spinner"></div><div>正在获取统计数据...</div></div>`;
                     const summaryData = await this._fetchSummaryData(effectiveUsername);
                     if (summaryData && Object.keys(summaryData).length > 0) {
-                        return this._renderSummaryData(summaryData, effectiveUsername, numLevel);
+                        return this._renderSummaryData(summaryData, effectiveUsername, numLevel, { ...dataMeta, source: dataMeta.source || 'summary', updatedAt: Date.now() });
                     }
                 }
 
@@ -14499,7 +14561,7 @@ a:hover{text-decoration:underline;}
                     try {
                         const cloudData = await this._fetchCloudRequirements(true);
                         if (cloudData && cloudData.length > 0) {
-                            return this._renderCloudRequirements(cloudData, effectiveUsername, numLevel);
+                            return this._renderCloudRequirements(cloudData, effectiveUsername, numLevel, { source: 'cloud', updatedAt: this._cloudReqsCacheTime || Date.now() });
                         }
                     } catch (e) { /* 云端获取失败，继续走简要显示 */ }
                 }
@@ -14607,7 +14669,7 @@ a:hover{text-decoration:underline;}
              * @param {string} username - 用户名
              * @param {number} level - 信任等级
              */
-            _renderCloudRequirements(cloudReqs, username, level) {
+            _renderCloudRequirements(cloudReqs, username, level, dataMeta = { source: 'cloud', updatedAt: Date.now() }) {
                 console.log('[LDSP] 云端升级数据:', JSON.stringify(cloudReqs));
                 const normalizedLevel = Number.parseInt(level, 10);
                 // 0-1级用户使用固定升级目标，避免复用 2+ 规则导致目标值错误
@@ -14616,7 +14678,7 @@ a:hover{text-decoration:underline;}
                     cloudReqs.forEach(req => {
                         data[req.name] = Utils.toSafeInt(req.currentValue, 0);
                     });
-                    return this._renderSummaryData(data, username, normalizedLevel);
+                    return this._renderSummaryData(data, username, normalizedLevel, dataMeta);
                 }
 
                 // 2-4级用户的升级/保持要求配置（基于 connect 页面的 14 项要求）
@@ -14685,7 +14747,8 @@ a:hover{text-decoration:underline;}
                 
                 // 渲染
                 this.renderer.renderUser(username, level.toString(), isOK, orderedReqs, displayName);
-                this.renderer.renderReqs(orderedReqs, level);
+                this._lastReqsMeta = dataMeta;
+                this.renderer.renderReqs(orderedReqs, level, dataMeta);
                 
                 this.cachedHistory = history;
                 this.cachedReqs = orderedReqs;
@@ -14917,7 +14980,7 @@ a:hover{text-decoration:underline;}
              * 渲染 summary 统计数据（低信任等级用户）
              * 使用与 2 级用户相同的 renderReqs 方法显示进度
              */
-            _renderSummaryData(data, username, level) {
+            _renderSummaryData(data, username, level, dataMeta = { source: 'summary', updatedAt: Date.now() }) {
                 console.log('[LDSP] Summary 数据:', JSON.stringify(data));
                 console.log('[LDSP] username:', username, 'level:', level);
                 // 构建要求数据结构（用于显示和趋势）
@@ -15036,7 +15099,8 @@ a:hover{text-decoration:underline;}
                 const levelText = Number.isFinite(normalizedLevel) ? normalizedLevel.toString() : String(level);
                 const levelForRender = Number.isFinite(normalizedLevel) ? normalizedLevel : level;
                 this.renderer.renderUser(username, levelText, isOK, reqs, displayName);
-                this.renderer.renderReqs(reqs, levelForRender);
+                this._lastReqsMeta = dataMeta;
+                this.renderer.renderReqs(reqs, levelForRender, dataMeta);
                 
                 // 保存缓存
                 this.cachedHistory = history;
@@ -15341,7 +15405,7 @@ a:hover{text-decoration:underline;}
                 return [...reqMap.values()];
             }
             
-            async _parse(html) {
+            async _parse(html, dataMeta = { source: 'network', updatedAt: Date.now() }) {
                 const doc = new DOMParser().parseFromString(html, 'text/html');
                 
                 // 尝试获取用户名（即使没有升级要求数据也可能有用户信息）
@@ -15412,10 +15476,10 @@ a:hover{text-decoration:underline;}
                         
                         // 直接使用 fallback 显示，不弹窗打扰用户
                         console.warn('[LDStatus Pro] Connect 页面认证失败，使用 summary 数据');
-                        return await this._showFallbackStats(oauthUsername, oauthLevel);
+                        return await this._showFallbackStats(oauthUsername, oauthLevel, { source: 'summary', updatedAt: Date.now(), error: 'Connect 页面认证失败' });
                     }
                     
-                    return await this._showFallbackStats(username, level);
+                    return await this._showFallbackStats(username, level, { source: 'summary', updatedAt: Date.now(), error: '未找到 Connect 升级要求区块' });
                 }
                 
                 if (section) {
@@ -15469,7 +15533,7 @@ a:hover{text-decoration:underline;}
                 
                 const reqs = this._ensureRequirementTargets(this._extractConnectRequirements(section), level);
                 if (!reqs.length) {
-                    return await this._showFallbackStats(username, level);
+                    return await this._showFallbackStats(username, level, { source: 'summary', updatedAt: Date.now(), error: 'Connect 未返回升级要求数据' });
                 }
                 console.log('[LDSP] 升级数据:', JSON.stringify(reqs.map(r => ({
                     name: r.name,
@@ -15517,7 +15581,8 @@ a:hover{text-decoration:underline;}
                     }
                 }
                 this.renderer.renderUser(username, level, isOK, orderedReqs, displayName);
-                this.renderer.renderReqs(orderedReqs, level);
+                this._lastReqsMeta = dataMeta;
+                this.renderer.renderReqs(orderedReqs, level, dataMeta);
 
                 this.cachedHistory = history;
                 this.cachedReqs = orderedReqs;
