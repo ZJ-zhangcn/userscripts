@@ -13,8 +13,8 @@ function between(start, end) {
 }
 
 assert.match(script, /@name\s+LDStatus Pro/);
-assert.match(script, /@version\s+3\.9\.0\.3-zj\.2/, 'local patch version should be bumped after data freshness UI changes');
-assert.match(script, /@description\s+.*数据来源\/更新时间/, 'metadata description should mention data freshness UI');
+assert.match(script, /@version\s+3\.9\.0\.3-zj\.3/, 'local patch version should be bumped after settings readability UI changes');
+assert.match(script, /@description\s+.*设置文字完整展示/, 'metadata description should mention readable settings UI');
 assert.match(script, /@downloadURL\s+https:\/\/raw\.githubusercontent\.com\/ZJ-zhangcn\/userscripts\/main\/LDStatusPro\.user\.js/);
 assert.match(script, /@updateURL\s+https:\/\/raw\.githubusercontent\.com\/ZJ-zhangcn\/userscripts\/main\/LDStatusPro\.user\.js/);
 
@@ -29,6 +29,15 @@ assert.match(script, /_renderDataMeta\(/, 'requirements renderer should show dat
 assert.match(script, /ldsp-data-meta/, 'data freshness UI should have stable CSS class');
 assert.match(script, /_withMeta\(data, \{\s*source:\s*'network'/, 'leaderboard network data should be marked as network source');
 assert.match(script, /source:\s*'fallback-cache'/, 'leaderboard fallback cache should be visibly marked');
+
+const settingsCss = between('.ldsp-settings-menu{', '#ldsp-panel.collapsed .ldsp-settings-menu');
+assert.match(settingsCss, /width:min\(380px,calc\(100vw - 24px\)\)/, 'settings menu should use a wider readable width');
+assert.match(settingsCss, /\.ldsp-settings-nav\{[^}]*flex-direction:column/, 'settings root items should use vertical card layout');
+assert.match(settingsCss, /\.ldsp-settings-nav-main\{[^}]*white-space:normal/, 'settings root item labels should wrap instead of ellipsizing');
+assert.match(settingsCss, /\.ldsp-settings-nav-value\{[^}]*align-self:flex-start/, 'settings values should render as their own badge line');
+assert.doesNotMatch(settingsCss, /\.ldsp-settings-nav-main\{[^}]*text-overflow:ellipsis/, 'settings root labels should not be truncated');
+assert.doesNotMatch(settingsCss, /\.ldsp-settings-nav-value\{[^}]*text-overflow:ellipsis/, 'settings values should not be truncated');
+assert.match(settingsCss, /\.ldsp-settings-option-desc\{[^}]*-webkit-line-clamp:2/, 'settings option descriptions should allow readable two-line wrapping');
 
 const forceRefresh = between('async forceRefresh(type = \'daily\')', '// 获取手动刷新剩余冷却时间');
 assert.doesNotMatch(forceRefresh, /fromCache:\s*true/, 'manual leaderboard refresh must not silently return stale cache on failure');

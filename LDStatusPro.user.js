@@ -1,8 +1,8 @@
 // ==UserScript==
 // @name         LDStatus Pro
 // @namespace    http://tampermonkey.net/
-// @version      3.9.0.3-zj.2
-// @description  在 Linux.do 和 IDCFlare 页面显示信任级别进度，支持历史趋势、里程碑通知、阅读时间统计、排行榜系统、我的活动查看。两站点均支持排行榜和云同步功能（ZJ 修正版：显示数据来源/更新时间，手动刷新更彻底清缓存）
+// @version      3.9.0.3-zj.3
+// @description  在 Linux.do 和 IDCFlare 页面显示信任级别进度，支持历史趋势、里程碑通知、阅读时间统计、排行榜系统、我的活动查看。两站点均支持排行榜和云同步功能（ZJ 修正版：显示数据来源/更新时间，手动刷新更彻底清缓存，设置文字完整展示）
 // @author       JackLiii
 // @license      MIT
 // @match        https://linux.do/*
@@ -4041,8 +4041,8 @@
     .ldsp-hdr-btns>button.has-update{background:linear-gradient(135deg,var(--ok),var(--ok-light));animation:pulse-update 3s ease-in-out infinite;position:relative;box-shadow:0 0 15px rgba(16,185,129,.4)}
     .ldsp-hdr-btns>button.has-update::after{content:'';position:absolute;top:-3px;right:-3px;width:10px;height:10px;background:var(--err);border-radius:50%;border:2px solid rgba(0,0,0,.2);animation:pulse-dot 2.5s ease infinite}
     #ldsp-panel.settings-open{overflow:visible}
-    .ldsp-settings-menu{position:absolute;top:34px;left:8px;right:auto;width:clamp(220px,85%,300px);min-width:0;max-width:min(300px,calc(100% - 16px));max-height:min(360px,calc(var(--h) - 56px));overflow-x:hidden;overflow-y:auto;padding:8px;box-sizing:border-box;background:var(--bg-card);border:1px solid var(--border2);border-radius:12px;box-shadow:var(--shadow-lg);opacity:0;pointer-events:none;transform:translateY(-8px) scale(.98);transition:opacity .2s var(--ease),transform .2s var(--ease);z-index:120}
-    #ldsp-panel.expand-left .ldsp-settings-menu{left:auto;right:8px;width:clamp(220px,85%,300px);max-width:min(300px,calc(100% - 16px))}
+    .ldsp-settings-menu{position:absolute;top:34px;left:8px;right:auto;width:min(380px,calc(100vw - 24px));min-width:min(280px,calc(100vw - 24px));max-width:calc(100vw - 24px);max-height:min(420px,calc(var(--h) - 56px));overflow-x:hidden;overflow-y:auto;padding:10px;box-sizing:border-box;background:var(--bg-card);border:1px solid var(--border2);border-radius:14px;box-shadow:var(--shadow-lg);opacity:0;pointer-events:none;transform:translateY(-8px) scale(.98);transition:opacity .2s var(--ease),transform .2s var(--ease);z-index:120}
+    #ldsp-panel.expand-left .ldsp-settings-menu{left:auto;right:8px;width:min(380px,calc(100vw - 24px));max-width:calc(100vw - 24px)}
     #ldsp-panel.settings-open .ldsp-hdr{border-top-left-radius:var(--r-lg);border-top-right-radius:var(--r-lg)}
     #ldsp-panel.settings-open .ldsp-hdr::before,#ldsp-panel.settings-open .ldsp-hdr::after{border-top-left-radius:inherit;border-top-right-radius:inherit}
     .ldsp-settings-menu.show{opacity:1;pointer-events:auto;transform:translateY(0) scale(1)}
@@ -4056,23 +4056,24 @@
     .ldsp-settings-head-title{font-size:12px;font-weight:700;color:var(--txt)}
     .ldsp-settings-back{width:24px;height:24px;border:none;border-radius:7px;background:var(--bg-el);color:var(--txt-sec);font-size:14px;display:flex;align-items:center;justify-content:center;transition:background .15s,color .15s}
     .ldsp-settings-back:hover{background:var(--bg-hover);color:var(--accent)}
-    .ldsp-settings-nav{display:flex;align-items:center;justify-content:space-between;gap:10px;width:100%;padding:9px 10px;margin-bottom:6px;border:1px solid transparent;border-radius:9px;background:var(--bg-el);color:var(--txt);font-size:11px;text-align:left;transition:background .15s,border-color .15s,transform .15s}
+    .ldsp-settings-nav{position:relative;display:flex;flex-direction:column;align-items:stretch;justify-content:flex-start;gap:7px;width:100%;padding:10px 28px 10px 12px;margin-bottom:8px;border:1px solid transparent;border-radius:11px;background:var(--bg-el);color:var(--txt);font-size:11px;text-align:left;transition:background .15s,border-color .15s,transform .15s}
     .ldsp-settings-nav:hover{background:var(--bg-hover);border-color:var(--border2);transform:translateY(-1px)}
-    .ldsp-settings-nav-main{display:flex;align-items:center;gap:8px;font-weight:600;min-width:0;flex:1 1 auto;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-    .ldsp-settings-nav-value{font-size:10px;color:var(--txt-mut);max-width:132px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;flex:0 0 auto}
-    .ldsp-settings-nav-arrow{font-size:13px;color:var(--txt-mut)}
+    .ldsp-settings-nav-main{display:flex;align-items:center;gap:8px;font-weight:650;min-width:0;flex:1 1 auto;white-space:normal;overflow:visible;text-overflow:clip;line-height:1.35;word-break:break-word}
+    .ldsp-settings-nav-value{display:inline-flex;align-self:flex-start;max-width:100%;padding:3px 8px;border-radius:999px;background:rgba(107,140,239,.12);border:1px solid rgba(107,140,239,.18);font-size:10px;font-weight:600;color:var(--txt-mut);white-space:normal;overflow:visible;text-overflow:clip;line-height:1.3;word-break:break-word;flex:0 1 auto}
+    .ldsp-settings-nav-value:empty{display:none}
+    .ldsp-settings-nav-arrow{position:absolute;right:12px;top:12px;font-size:13px;color:var(--txt-mut)}
     .ldsp-settings-title{font-size:11px;font-weight:700;color:var(--txt-sec);margin:2px 0 8px;padding:0 2px}
     .ldsp-settings-option{display:flex;align-items:center;justify-content:space-between;gap:10px;width:100%;text-align:left;border:1px solid transparent;background:var(--bg-el);color:var(--txt);padding:8px 10px;border-radius:9px;font-size:11px;transition:border-color .15s,background .15s,transform .15s}
     .ldsp-settings-option+.ldsp-settings-option{margin-top:6px}
     .ldsp-settings-option:hover{background:var(--bg-hover);border-color:var(--border2);transform:translateY(-1px)}
     .ldsp-settings-option.active{border-color:var(--accent);background:rgba(107,140,239,.18)}
     .ldsp-settings-option-main{display:flex;flex-direction:column;gap:2px;min-width:0;flex:1 1 auto}
-    .ldsp-settings-option-label{font-size:11px;font-weight:600;color:var(--txt)}
-    .ldsp-settings-option-desc{font-size:9px;color:var(--txt-mut);line-height:1.3}
+    .ldsp-settings-option-label{font-size:11px;font-weight:600;color:var(--txt);white-space:normal;line-height:1.35;word-break:break-word}
+    .ldsp-settings-option-desc{font-size:9px;color:var(--txt-mut);line-height:1.35;white-space:normal;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;word-break:break-word}
     .ldsp-settings-option-check{font-size:12px;color:var(--accent);opacity:0;transform:scale(.8);transition:opacity .15s,transform .15s}
     .ldsp-settings-option.active .ldsp-settings-option-check{opacity:1;transform:scale(1)}
     .ldsp-settings-toggle{display:flex;align-items:center;justify-content:space-between;gap:10px;font-size:11px;color:var(--txt);padding:8px 10px;border-radius:9px;background:var(--bg-el);border:1px solid transparent;transition:border-color .15s,background .15s}
-    .ldsp-settings-toggle>span{min-width:0;flex:1 1 auto;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    .ldsp-settings-toggle>span{min-width:0;flex:1 1 auto;white-space:normal;overflow:visible;text-overflow:clip;line-height:1.35;word-break:break-word}
     .ldsp-settings-toggle+.ldsp-settings-toggle{margin-top:6px}
     .ldsp-settings-toggle:hover{background:var(--bg-hover);border-color:var(--border2)}
     .ldsp-settings-toggle input{accent-color:var(--accent);cursor:pointer}
@@ -4102,8 +4103,8 @@
     .ldsp-settings-order-label{font-size:11px;font-weight:600;color:var(--txt);min-width:0;flex:1 1 auto;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
     .ldsp-settings-order-reset{width:100%;margin-top:10px;padding:8px 10px;border:1px solid var(--border2);border-radius:9px;background:var(--bg-el);color:var(--txt-sec);font-size:11px;font-weight:600;transition:background .15s,border-color .15s,color .15s}
     .ldsp-settings-order-reset:hover{background:var(--bg-hover);border-color:var(--accent);color:var(--accent)}
-    @media (max-width:480px){.ldsp-settings-menu,#ldsp-panel.expand-left .ldsp-settings-menu{top:30px;left:4px;right:auto;width:calc(100% - 8px);min-width:0;max-width:calc(100% - 8px);max-height:min(320px,calc(var(--h) - 48px));padding:6px}.ldsp-settings-view{max-height:calc(var(--h) - 64px);padding:1px}.ldsp-settings-head{padding:5px 2px 8px;margin-bottom:6px}.ldsp-settings-nav,.ldsp-settings-option,.ldsp-settings-toggle,.ldsp-settings-order-item{padding:7px 8px;font-size:10px}.ldsp-settings-nav-value{max-width:76px;font-size:9px}.ldsp-settings-option-label{font-size:10px}.ldsp-settings-option-desc,.ldsp-settings-order-tip,.ldsp-settings-goal-hint,.ldsp-settings-font-hint{font-size:9px}.ldsp-settings-goal-row{padding:7px 8px;gap:6px}.ldsp-settings-goal-number{width:64px;padding:4px 6px;font-size:10px}}
-    @media (max-width:320px){.ldsp-settings-menu,#ldsp-panel.expand-left .ldsp-settings-menu{top:28px;left:2px;right:auto;width:calc(100% - 4px);min-width:0;max-width:calc(100% - 4px);max-height:min(280px,calc(var(--h) - 40px));padding:5px}.ldsp-settings-view{max-height:calc(var(--h) - 56px)}.ldsp-settings-head-title{font-size:11px}.ldsp-settings-nav,.ldsp-settings-option,.ldsp-settings-toggle,.ldsp-settings-order-item{padding:6px 7px;font-size:9px}.ldsp-settings-nav-main{gap:6px}.ldsp-settings-goal-label{min-width:46px;font-size:10px}.ldsp-settings-goal-number{width:56px;font-size:9px}.ldsp-settings-order-reset{padding:7px 8px;font-size:10px}}
+    @media (max-width:480px){.ldsp-settings-menu,#ldsp-panel.expand-left .ldsp-settings-menu{top:30px;left:4px;right:auto;width:calc(100% - 8px);min-width:0;max-width:calc(100% - 8px);max-height:min(360px,calc(var(--h) - 48px));padding:6px}.ldsp-settings-view{max-height:calc(var(--h) - 64px);padding:1px}.ldsp-settings-head{padding:5px 2px 8px;margin-bottom:6px}.ldsp-settings-nav,.ldsp-settings-option,.ldsp-settings-toggle,.ldsp-settings-order-item{padding:8px 9px;font-size:10px}.ldsp-settings-nav{padding-right:26px}.ldsp-settings-nav-value{max-width:100%;font-size:9px}.ldsp-settings-option-label{font-size:10px}.ldsp-settings-option-desc,.ldsp-settings-order-tip,.ldsp-settings-goal-hint,.ldsp-settings-font-hint{font-size:9px}.ldsp-settings-goal-row{padding:7px 8px;gap:6px}.ldsp-settings-goal-number{width:64px;padding:4px 6px;font-size:10px}}
+    @media (max-width:320px){.ldsp-settings-menu,#ldsp-panel.expand-left .ldsp-settings-menu{top:28px;left:2px;right:auto;width:calc(100% - 4px);min-width:0;max-width:calc(100% - 4px);max-height:min(300px,calc(var(--h) - 40px));padding:5px}.ldsp-settings-view{max-height:calc(var(--h) - 56px)}.ldsp-settings-head-title{font-size:11px}.ldsp-settings-nav,.ldsp-settings-option,.ldsp-settings-toggle,.ldsp-settings-order-item{padding:7px 8px;font-size:9px}.ldsp-settings-nav{padding-right:24px}.ldsp-settings-nav-main{gap:6px}.ldsp-settings-goal-label{min-width:46px;font-size:10px}.ldsp-settings-goal-number{width:56px;font-size:9px}.ldsp-settings-order-reset{padding:7px 8px;font-size:10px}}
     @media (max-height:620px){.ldsp-settings-menu{top:30px;max-height:min(280px,calc(var(--h) - 40px))}.ldsp-settings-view{max-height:calc(var(--h) - 56px)}}
     @media (max-height:500px){.ldsp-settings-menu{top:26px;max-height:min(240px,calc(var(--h) - 28px))}.ldsp-settings-head{padding:4px 2px 6px;margin-bottom:5px}.ldsp-settings-nav,.ldsp-settings-option,.ldsp-settings-toggle,.ldsp-settings-order-item{padding:6px 7px}}
     #ldsp-panel.collapsed .ldsp-settings-menu{display:none!important}
