@@ -35,6 +35,20 @@ Raw 安装地址：
 
 <https://raw.githubusercontent.com/ZJ-zhangcn/userscripts/main/LDStatusPro.user.js>
 
+## Nodeseek Pro Safe
+
+基于 Nodeseek Pro `1.0.8` 的个人安全精简版，保留 NodeSeek/DeepFlood 论坛体验增强功能，并移除更敏感或外部依赖较强的功能：
+
+- 移除 AI 美化模块和跨域 AI API 请求。
+- 移除 NodeImage 图床上传助手。
+- 移除外部邮箱入口。
+- 移除侧边卡片通知轮询。
+- 移除 GreasyFork 反馈快捷入口。
+
+Raw 安装地址：
+
+<https://raw.githubusercontent.com/ZJ-zhangcn/userscripts/main/NodeseekProSafe.user.js>
+
 ## License
 
 MIT
