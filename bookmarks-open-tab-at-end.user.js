@@ -4,7 +4,6 @@
 // @version      1.0.0
 // @description  让 bookmarks 中打开的书签默认出现在浏览器标签栏最后
 // @author       ZJ-zhangcn
-// @icon    https://komari.942645.xyz/assets/pwa-icon.png
 // @match        https://bookmarks.zhangjiner.com/*
 // @match        https://bookmarks.942645.xyz/*
 // @grant        GM_openInTab
