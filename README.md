@@ -49,6 +49,19 @@ Raw 安装地址：
 
 <https://raw.githubusercontent.com/ZJ-zhangcn/userscripts/main/NodeseekProSafe.user.js>
 
+## YouTube Improvements Safe
+
+基于 YouTube Improvements `1.1.5` 的个人安全精简版，保留 YouTube 布局、倍速、截图、画中画、循环播放、主题和广告标记等增强功能，并移除引流/下载相关能力：
+
+- 移除第三方下载站引流入口和 `@antifeature referral-link`。
+- 移除视频下载按钮、Shorts 下载按钮和相关设置项。
+- 移除未使用的高风险权限：`GM_xmlhttpRequest`、`GM_download`、`GM_setClipboard`、`GM_deleteValue`。
+- 移除打开第三方标签页权限：`GM_openInTab` / `GM.openInTab`。
+
+Raw 安装地址：
+
+<https://raw.githubusercontent.com/ZJ-zhangcn/userscripts/main/YouTubeImprovementsSafe.user.js>
+
 ## License
 
 MIT
