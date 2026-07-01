@@ -4,6 +4,7 @@
 // @version      1.0.1
 // @description  让 bookmarks 中打开的书签默认出现在浏览器标签栏最后，并避免编辑等卡片操作按钮误触发
 // @author       ZJ-zhangcn
+// @icon         https://bookmarks.942645.xyz/assets/icon-Cox8aGIg.svg
 // @match        https://bookmarks.zhangjiner.com/*
 // @match        https://bookmarks.942645.xyz/*
 // @grant        GM_openInTab
