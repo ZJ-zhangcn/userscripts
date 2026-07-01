@@ -11,7 +11,7 @@
 // @license    GPL-3.0-only
 // @create     2015-11-25
 // @run-at     document-start
-// @version    27.20-zj.2
+// @version    27.20-zj.3
 // @connect    baidu.com
 // @connect    google.com
 // @connect    google.com.hk
@@ -1021,7 +1021,7 @@
       return await cacheStyle(styleName, getRenderStyle)
 
       async function cacheStyle(styleName, getLessDataFunc) {
-        const renderCSSKeyName = '__AC.RenderCSS__' + styleName
+        const renderCSSKeyName = '__AC.RenderCSS__' + styleName + (styleName === 'HuaHua-ACDrakMode' ? '@zj.3' : '')
         const localData = localStorage.getItem(renderCSSKeyName)
         if (localData) {
           setTimeout(() => {
@@ -1044,6 +1044,16 @@
       async function getRenderStyle() {
         return GM_getResourceText(styleName)
       }
+    }
+
+    isSystemDarkMode() {
+      return !!(window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches)
+    }
+
+    isDarkModeActive() {
+      // 原脚本的暗黑模式开关默认是 false；Safe 版没有保留远程设置页，
+      // 所以这里改为：用户显式开启时启用，或浏览器/系统处于深色模式时自动启用。
+      return !!this.curConfig.isDarkModeEnable || this.isSystemDarkMode()
     }
 
     async loadSiteCSS() {
@@ -1072,7 +1082,7 @@
         this.adsCSSList.huyanStyle = await this.getHuyanStyle()
       }
 
-      if (this.curConfig.isDarkModeEnable) {
+      if (this.isDarkModeActive()) {
         this.adsCSSList.darkModeStyle = await this.loadStyleByName_WithLessCache('HuaHua-ACDrakMode')
       }
       // 加载自定义样式
@@ -1851,7 +1861,7 @@
           CONST.cssAutoInsert.add("bgFitStyle", CONST.adsCSSList.bgAutoFitStyle)
         }
       }
-      if (CONST.curConfig.isDarkModeEnable) {
+      if (CONST.isDarkModeActive()) {
         CONST.cssAutoInsert.add("darkModeStyle", CONST.adsCSSList.darkModeStyle)
       }
       if (CONST.curConfig.isAutopage) {
@@ -2749,6 +2759,18 @@
         await CONST.loadSiteCSS()
         PageFunc.dataChangeFireCallback()
       })
+      if (window.matchMedia) {
+        const darkModeMedia = window.matchMedia('(prefers-color-scheme: dark)')
+        const refreshDarkModeStyle = async () => {
+          await CONST.loadSiteCSS()
+          PageFunc.dataChangeFireCallback()
+        }
+        if (darkModeMedia.addEventListener) {
+          darkModeMedia.addEventListener('change', refreshDarkModeStyle)
+        } else if (darkModeMedia.addListener) {
+          darkModeMedia.addListener(refreshDarkModeStyle)
+        }
+      }
       watch(CONST.cssFavionList, () => {
         const baseCSS = 'h3::before, h2::before {content: " ";display:inline-block} *[data-favicon-t]:before{width: 16px; height: 16px; margin-right: 4px; background-size: 100% 100%; vertical-align: text-top;}'
         CONST.adsCSSList.faviconStyle = Object.entries(CONST.cssFavionList.list).reduce((preCSS, cur) => {
