@@ -164,6 +164,85 @@ body[baidu] {
         color: var(--huahua-color) !important;
       }
     }
+    // 百度图片/商家/视频等富结果模块
+    #content_left {
+      > .c-container,
+      > .result-op,
+      .new-pmd,
+      .cosc-card,
+      article,
+      .c-border,
+      [tpl*="image"],
+      [tpl*="img"],
+      [tpl*="video"],
+      [tpl*="movie"],
+      [tpl*="shop"],
+      [tpl*="business"],
+      [tpl*="merchant"],
+      [class*="image"],
+      [class*="img"],
+      [class*="video"],
+      [class*="shop"],
+      [class*="business"],
+      [class*="merchant"],
+      [class*="aladdin"],
+      [class*="tuwen"],
+      [class*="card"] {
+        color: var(--huahua-color-secondary) !important;
+        background-color: var(--huahua-card-bg) !important;
+        border-color: var(--huahua-border) !important;
+        box-shadow: none !important;
+      }
+      > .c-container:hover,
+      > .result-op:hover,
+      > .result:hover,
+      .new-pmd:hover,
+      .cosc-card:hover {
+        border-color: #607086 !important;
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.28) !important;
+      }
+      .op-soft-title,
+      h3[class*="title"],
+      .title,
+      [class*="title"],
+      [class*="name"],
+      [class*="caption"],
+      [class*="desc"],
+      [class*="summary"],
+      [class*="source"],
+      [class*="sub"],
+      [class*="tag"],
+      [class*="label"],
+      [class*="text"] {
+        color: var(--huahua-color-secondary) !important;
+        background-color: transparent !important;
+      }
+      h3[class*="title"],
+      h3[class*="title"] a,
+      [class*="title"] a,
+      [class*="name"] a {
+        color: var(--huahua-blue) !important;
+      }
+      .c-tabs,
+      .c-tabs-content,
+      [class*="tab"],
+      [class*="filter"],
+      [class*="nav"],
+      [class*="switch"],
+      [class*="button"],
+      [class*="btn"] {
+        color: var(--huahua-color) !important;
+        background-color: var(--huahua-bg) !important;
+        border-color: var(--huahua-border) !important;
+      }
+      .c-tabs a,
+      .c-tabs-content a,
+      [class*="tab"] a,
+      [class*="filter"] a,
+      [class*="nav"] a {
+        color: var(--huahua-blue) !important;
+      }
+    }
     // 自动翻页
     .sp-separator.AC {
       background-color: var(--huahua-bg) !important;
