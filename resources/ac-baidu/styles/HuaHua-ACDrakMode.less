@@ -252,6 +252,110 @@ body[baidu] {
       }
     }
   }
+  // 顶部分类 Tab 与非 wrapper_new 下的百度富结果兜底
+  #container,
+  #wrapper_wrapper,
+  #content_left,
+  #content_right {
+    background-color: transparent !important;
+  }
+  #s_tab,
+  #s_tab.s_tab,
+  #s_tab .s_tab_inner,
+  .s_tab,
+  .s-tab,
+  [class*="s-tab"],
+  [class*="head-tab"],
+  [tpl="app/head-tab"],
+  .result-molecule.new-pmd[tpl="app/head-tab"] {
+    color: var(--huahua-color) !important;
+    background-color: var(--huahua-bg) !important;
+    border-color: var(--huahua-border) !important;
+  }
+  #s_tab a,
+  #s_tab span,
+  .s_tab a,
+  .s-tab a,
+  .s-tab-item,
+  [class*="s-tab"] a,
+  [class*="head-tab"] a {
+    color: var(--huahua-color-secondary) !important;
+    background-color: transparent !important;
+  }
+  #s_tab a:hover,
+  #s_tab .cur-tab,
+  .s-tab-item:hover,
+  .s-tab-item.cur-tab,
+  [class*="head-tab"] a:hover {
+    color: var(--huahua-color-highlight) !important;
+  }
+  #wrapper #content_left > .c-container,
+  #wrapper #content_left > .result,
+  #wrapper #content_left > .result-op,
+  #wrapper #content_left .result-op,
+  #wrapper #content_left .c-container,
+  #wrapper #content_left .new-pmd,
+  #wrapper #content_left .cosc-card,
+  #wrapper #content_left article,
+  #wrapper #content_left .c-border,
+  #wrapper #content_left [tpl*="image"],
+  #wrapper #content_left [tpl*="img"],
+  #wrapper #content_left [tpl*="video"],
+  #wrapper #content_left [tpl*="movie"],
+  #wrapper #content_left [tpl*="shop"],
+  #wrapper #content_left [tpl*="business"],
+  #wrapper #content_left [tpl*="merchant"],
+  #wrapper #content_left [class*="image"],
+  #wrapper #content_left [class*="img"],
+  #wrapper #content_left [class*="video"],
+  #wrapper #content_left [class*="shop"],
+  #wrapper #content_left [class*="business"],
+  #wrapper #content_left [class*="merchant"],
+  #wrapper #content_left [class*="aladdin"],
+  #wrapper #content_left [class*="tuwen"],
+  #wrapper #content_left [class*="card"] {
+    color: var(--huahua-color-secondary) !important;
+    background-color: var(--huahua-card-bg) !important;
+    border-color: var(--huahua-border) !important;
+    box-shadow: none !important;
+  }
+  #wrapper #content_left h3[class*="title"],
+  #wrapper #content_left h3[class*="title"] a,
+  #wrapper #content_left [class*="title"] a,
+  #wrapper #content_left [class*="name"] a,
+  #wrapper #content_left .c-tabs a,
+  #wrapper #content_left .c-tabs-content a,
+  #wrapper #content_left [class*="tab"] a,
+  #wrapper #content_left [class*="filter"] a,
+  #wrapper #content_left [class*="nav"] a {
+    color: var(--huahua-blue) !important;
+  }
+  #wrapper #content_left .op-soft-title,
+  #wrapper #content_left [class*="title"],
+  #wrapper #content_left [class*="name"],
+  #wrapper #content_left [class*="caption"],
+  #wrapper #content_left [class*="desc"],
+  #wrapper #content_left [class*="summary"],
+  #wrapper #content_left [class*="source"],
+  #wrapper #content_left [class*="sub"],
+  #wrapper #content_left [class*="tag"],
+  #wrapper #content_left [class*="label"],
+  #wrapper #content_left [class*="text"] {
+    color: var(--huahua-color-secondary) !important;
+    background-color: transparent !important;
+  }
+  #wrapper #content_left .c-tabs,
+  #wrapper #content_left .c-tabs-content,
+  #wrapper #content_left [class*="tab"],
+  #wrapper #content_left [class*="filter"],
+  #wrapper #content_left [class*="nav"],
+  #wrapper #content_left [class*="switch"],
+  #wrapper #content_left [class*="button"],
+  #wrapper #content_left [class*="btn"] {
+    color: var(--huahua-color) !important;
+    background-color: var(--huahua-bg) !important;
+    border-color: var(--huahua-border) !important;
+  }
   // 二级标题/右侧栏
   .c-color-t {
     color: var(--huahua-color) !important;
