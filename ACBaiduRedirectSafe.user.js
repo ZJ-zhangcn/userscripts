@@ -11,7 +11,7 @@
 // @license    GPL-3.0-only
 // @create     2015-11-25
 // @run-at     document-start
-// @version    27.20-zj.1
+// @version    27.20-zj.2
 // @connect    baidu.com
 // @connect    google.com
 // @connect    google.com.hk

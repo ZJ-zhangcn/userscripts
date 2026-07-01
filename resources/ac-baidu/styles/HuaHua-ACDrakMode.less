@@ -1,14 +1,17 @@
 /*** DarkMode Color Val ***/
 :root {
-  --huahua-bg: #1f1f1f;
-  --huahua-bg-dark: #121212;
-  --huahua-bg-light: #4f4f4f;
-  --huahua-color: #c8c8c8;
-  --huahua-color-highlight: #fcfcfc;
-  --huahua-color-secondary: #707070;
-  --huahua-red: #dc4f4f;
-  --huahua-blue: #5972d8;
-  --huahua-bg-blue: #1d3a8a;
+  --huahua-bg: #202124;
+  --huahua-bg-dark: #121417;
+  --huahua-bg-light: #353b45;
+  --huahua-card-bg: #1f2329;
+  --huahua-border: #4b5563;
+  --huahua-color: #e8eaed;
+  --huahua-color-highlight: #ffffff;
+  --huahua-color-secondary: #bdc1c6;
+  --huahua-color-muted: #9aa0a6;
+  --huahua-red: #ff8a80;
+  --huahua-blue: #8ab4f8;
+  --huahua-bg-blue: #1a73e8;
 }
 
 /*** Google Dark Mode ****/
@@ -114,28 +117,35 @@ body[baidu] {
     div[class|="result"]:not(.result-molecule),
     .result {
       color: var(--huahua-color-secondary) !important;
+      background-color: var(--huahua-card-bg) !important;
+      padding: 10px 12px;
+      border: 1px var(--huahua-border) solid !important;
+      border-radius: 10px !important;
       a {
         color: var(--huahua-blue) !important;
         background-color: transparent !important;
       }
+      a:visited {
+        color: #d2a8ff !important;
+      }
       em {
         color: var(--huahua-red) !important;
       }
-      h3[class*="title"] {
+      h3[class*="title"],
+      h3[class*="title"] a,
+      [class*="title-content"],
+      [class*="title-content"] a {
+        color: var(--huahua-blue) !important;
         background-color: transparent !important;
       }
-      background-color: var(--huahua-bg) !important;
-      padding: 8px;
-      border: 1px var(--huahua-bg-light) solid !important;
-      border-radius: 10px !important;
-      // 全网热搜分页器
-      [class^="pag-wrap"] span {
-        background-color: var(--huahua-bg-light) !important;
-        color: var(--huahua-color) !important;
-      }
-      // 百度文库/百度百科/资讯详情文本
+      .c-abstract,
+      .content-right_8Zs40,
       .cu-color-text,
       .c-color-text,
+      .c-span-last,
+      .c-color-gray,
+      .c-color-gray2,
+      span[class*="content"],
       div[class|="group-sub"] {
         color: var(--huahua-color-secondary) !important;
       }
