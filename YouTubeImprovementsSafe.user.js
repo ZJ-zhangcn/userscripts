@@ -70,7 +70,7 @@
 // @description:ug    YouTube نى كۆپلىگەن پايدىلىق ئىقتىدارلار بىلەن كۈچەيتىدىغان ئىشلەتكۈچى سكرىپتى، بۇلار: ۋىدىئو تەپسىلات بەتنىڭ ئوپتىماللاشتۇرۇلغان تۈزۈلىشى، ۋىدىئو چۈشۈرۈش، سكرىنشات ئېلىش، قارا/ئاق تېما ئالماشتۇرۇش، تېز ئالغا سۈرۈش كونتروللىرى ۋە باشقىلار.
 // @description:vi    Một userscript giúp nâng cao YouTube với nhiều tính năng hữu ích, bao gồm: bố cục trang chi tiết video được tối ưu hóa, tải video, chụp ảnh màn hình, chuyển đổi chủ đề tối/sáng, điều khiển tua nhanh và nhiều tính năng khác.
 // @namespace   https://github.com/ZJ-zhangcn/userscripts
-// @version     1.1.5-zj.1
+// @version     1.1.5-zj.2
 // @author      Thalrien.vx,CY Fung
 // @icon        data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACsAAAAgCAYAAACLmoEDAAABo0lEQVR4AdSXAZKDIBAEiR878zL1Zbmf5aY3txaWpqKyWCS1I4jotiMi6VLh75lSv1eFqdIKNks8qv7I9FR9JQE89mrr/KzNc5HXpOsuYgGrE0cd9eSD6n0mVauG5yKvCR7kWWdYNSoSnfxYCyU8g8C4kdcw0A6OtgD3jgHoF6x62I7KVsNe4k6umsWtUmZcA2P2W2DnYZDdQLPVHmd/AvB+A67x8RLAfuy0o8N0S0mRplTxFwVriKJlCqwGDGzoCwawpIh3GVhzJXoj2lFSxEFXg/WbF60PjeLhUR0WaICR6kXAl8AK0oMpDvn+ofISWD7pki89T7/Q1WEFyZgF9DSk218NFkhJEbdGBvb0GPI7zkvRsZzDyfBlJ7B5rtP1DBLQ4ke+BRIFi4vVIB08CvaQk578aAls0UR9NGFJf2BLzr/y3KnTZzB0NqhJ7842PxRk6miwVORIyw6bmQYr0CTgu0prVNlKYOBdbHyyl/9uaZQUCWhEZ3QFPHlc5AYS0Wb5Z2dt738jWlb5iM7opraV1J2ncVhb11IbeVzkniGVx+IPAAD///H503IAAAAGSURBVAMApvWIs8xfbPkAAAAASUVORK5CYII=
 // @include     *://*.youtube.com/**
@@ -4793,6 +4793,15 @@
         isOpenSpeedControl: true,
         isOpenMarkOrRemoveAd: true
       });
+      let hasSettingChanged = false;
+      const saveFunctionStateIfChanged = (key, checked) => {
+        if (functionState[key] === checked) {
+          return;
+        }
+        functionState[key] = checked;
+        hasSettingChanged = true;
+        StorageUtil.setValue(StorageUtil.keys.youtube.functionState, functionState);
+      };
       const language = LangueUtil.getLanguage();
       const styleSheet = `
 			.row-item{
@@ -4919,24 +4928,22 @@
           speedControl.checked = functionState.isOpenSpeedControl;
           markOrRemoveAd.checked = functionState.isOpenMarkOrRemoveAd;
           commentTable.addEventListener("change", (e) => {
-            functionState.isOpenCommentTable = e.target.checked;
-            StorageUtil.setValue(StorageUtil.keys.youtube.functionState, functionState);
+            saveFunctionStateIfChanged("isOpenCommentTable", e.target.checked);
           });
           themeProgressBar.addEventListener("change", (e) => {
-            functionState.isOpenThemeProgressBar = e.target.checked;
-            StorageUtil.setValue(StorageUtil.keys.youtube.functionState, functionState);
+            saveFunctionStateIfChanged("isOpenThemeProgressBar", e.target.checked);
           });
           speedControl.addEventListener("change", (e) => {
-            functionState.isOpenSpeedControl = e.target.checked;
-            StorageUtil.setValue(StorageUtil.keys.youtube.functionState, functionState);
+            saveFunctionStateIfChanged("isOpenSpeedControl", e.target.checked);
           });
           markOrRemoveAd.addEventListener("change", (e) => {
-            functionState.isOpenMarkOrRemoveAd = e.target.checked;
-            StorageUtil.setValue(StorageUtil.keys.youtube.functionState, functionState);
+            saveFunctionStateIfChanged("isOpenMarkOrRemoveAd", e.target.checked);
           });
         },
         onClose: function() {
-          location.reload();
+          if (hasSettingChanged) {
+            location.reload();
+          }
         }
       });
     },
