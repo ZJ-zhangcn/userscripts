@@ -5,6 +5,7 @@
 // @version      1.0.8-zj.1
 // @match        *://www.nodeseek.com/*
 // @match        *://www.deepflood.com/*
+// @icon         https://www.google.com/s2/favicons?domain=www.nodeseek.com&sz=64
 // @require      https://s4.zstatic.net/ajax/libs/layui/2.10.3/layui.min.js
 // @resource     highlightStyle https://s4.zstatic.net/ajax/libs/highlight.js/11.9.0/styles/atom-one-light.min.css
 // @resource     highlightStyle_dark https://s4.zstatic.net/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css
