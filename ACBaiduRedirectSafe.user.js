@@ -11,7 +11,7 @@
 // @license    GPL-3.0-only
 // @create     2015-11-25
 // @run-at     document-start
-// @version    27.20-zj.5
+// @version    27.20-zj.6
 // @connect    baidu.com
 // @connect    google.com
 // @connect    google.com.hk
@@ -1021,7 +1021,7 @@
       return await cacheStyle(styleName, getRenderStyle)
 
       async function cacheStyle(styleName, getLessDataFunc) {
-        const renderCSSKeyName = '__AC.RenderCSS__' + styleName + (styleName === 'HuaHua-ACDrakMode' ? '@zj.5' : '')
+        const renderCSSKeyName = '__AC.RenderCSS__' + styleName + (styleName === 'HuaHua-ACDrakMode' ? '@zj.6' : '')
         const localData = localStorage.getItem(renderCSSKeyName)
         if (localData) {
           setTimeout(() => {
