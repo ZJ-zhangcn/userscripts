@@ -15,10 +15,124 @@
 }
 
 /*** Google Dark Mode ****/
-body[google] {
+body[google],
+body.srp,
+body[class*="srp"] {
+  background-color: var(--huahua-bg-dark) !important;
+  color: var(--huahua-color) !important;
+
   &,
-  & .g {
+  #main,
+  #cnt,
+  #center_col,
+  #rcnt,
+  #rso,
+  #search,
+  #searchform,
+  #top_nav,
+  #hdtb,
+  #hdtbSum,
+  #appbar,
+  .sfbg,
+  .yg51vc,
+  .GyAeWb {
+    background-color: var(--huahua-bg-dark) !important;
+    color: var(--huahua-color) !important;
+  }
+
+  // 顶部分类：全部 / 图片 / 商家 / 视频 / 新闻等
+  #hdtb,
+  #hdtbSum,
+  #hdtb-msb,
+  #hdtb-msb-vis,
+  div[role="navigation"],
+  div[role="list"],
+  a[href*="tbm=isch"],
+  a[href*="tbm=vid"],
+  a[href*="tbm=shop"],
+  a[href*="tbm=lcl"],
+  a[href*="udm=2"],
+  a[href*="udm=7"],
+  a[href*="udm=28"],
+  a[href*="/maps"] {
+    color: var(--huahua-color-secondary) !important;
+    background-color: var(--huahua-bg) !important;
+    border-color: var(--huahua-border) !important;
+  }
+  #hdtb a,
+  #hdtb span,
+  #hdtb div,
+  div[role="navigation"] a,
+  div[role="navigation"] span,
+  div[role="list"] a,
+  div[role="list"] span {
+    color: var(--huahua-color-secondary) !important;
     background-color: transparent !important;
+  }
+  #hdtb a:hover,
+  div[role="navigation"] a:hover,
+  div[role="list"] a:hover {
+    color: var(--huahua-color-highlight) !important;
+  }
+
+  // 普通结果与 Google 富结果卡片
+  #rso .g,
+  #rso > div,
+  .MjjYud,
+  .A6K0A,
+  .Ww4FFb,
+  .ULSxyf,
+  .kp-blk,
+  .vk_c,
+  .commercial-unit-desktop-top,
+  .pla-unit,
+  g-section-with-header,
+  g-scrolling-carousel,
+  div[two-child],
+  div[data-hveid],
+  div[data-ved] {
+    color: var(--huahua-color-secondary) !important;
+    background-color: var(--huahua-card-bg) !important;
+    border-color: var(--huahua-border) !important;
+    box-shadow: none !important;
+  }
+
+  a,
+  a span,
+  h3,
+  h3 span {
+    color: var(--huahua-blue) !important;
+    background-color: transparent !important;
+  }
+  a:visited,
+  a:visited span {
+    color: #d2a8ff !important;
+  }
+  cite,
+  em,
+  .VuuXrf,
+  .NJjxre,
+  .iUh30,
+  .tjvcx,
+  .MUxGbd,
+  .IsZvec,
+  .VwiC3b,
+  .s,
+  .st,
+  span[class*="text"],
+  div[class*="snippet"],
+  div[class*="description"] {
+    color: var(--huahua-color-secondary) !important;
+    background-color: transparent !important;
+  }
+
+  input,
+  textarea,
+  .RNNXgb,
+  .aajZCb {
+    color: var(--huahua-color) !important;
+    background-color: var(--huahua-bg) !important;
+    border-color: var(--huahua-border) !important;
   }
 }
 

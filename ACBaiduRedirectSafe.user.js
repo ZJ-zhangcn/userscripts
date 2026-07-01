@@ -11,7 +11,7 @@
 // @license    GPL-3.0-only
 // @create     2015-11-25
 // @run-at     document-start
-// @version    27.20-zj.6
+// @version    27.20-zj.7
 // @connect    baidu.com
 // @connect    google.com
 // @connect    google.com.hk
@@ -628,8 +628,13 @@
       // 图片站 、地图站、购物站
       if (this.useItem.SiteTypeID === 4) {
         if (location.href.search(/tbm=(isch|lcl|shop|flm)/) > 0) {
-          console.mylog("特殊站,不加载样式，不添加menu");
-          this.gmInstance.curConfig.enableCSS = false
+          if (this.gmInstance.isDarkModeActive()) {
+            console.mylog("Google特殊站：保留CSS以应用深色模式");
+            this.gmInstance.curConfig.enableCSS = true
+          } else {
+            console.mylog("特殊站,不加载样式，不添加menu");
+            this.gmInstance.curConfig.enableCSS = false
+          }
         }
       }
 
@@ -1021,7 +1026,7 @@
       return await cacheStyle(styleName, getRenderStyle)
 
       async function cacheStyle(styleName, getLessDataFunc) {
-        const renderCSSKeyName = '__AC.RenderCSS__' + styleName + (styleName === 'HuaHua-ACDrakMode' ? '@zj.6' : '')
+        const renderCSSKeyName = '__AC.RenderCSS__' + styleName + (styleName === 'HuaHua-ACDrakMode' ? '@zj.7' : '')
         const localData = localStorage.getItem(renderCSSKeyName)
         if (localData) {
           setTimeout(() => {
