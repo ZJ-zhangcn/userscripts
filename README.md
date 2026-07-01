@@ -62,6 +62,20 @@ Raw 安装地址：
 
 <https://raw.githubusercontent.com/ZJ-zhangcn/userscripts/main/YouTubeImprovementsSafe.user.js>
 
+## AC-baidu Redirect Safe
+
+基于 AC-baidu `27.20` 的个人安全精简版，保留搜索结果去重定向、favicon、样式/双列、拦截规则和自动翻页等核心功能，并收紧外部依赖和运行范围：
+
+- 移除 `@connect *`，仅保留搜索引擎、favicon 与本仓库 Raw 资源所需连接。
+- 移除 `localhost`、`90dao.com`、`tujidu.com` 页面作用域。
+- 移除 90dao/tujidu 远程设置页、GM 页面桥接和相关探测请求。
+- 移除不可用的 GitCode Lite CSS 资源和对应开关。
+- 将 Less/Vue 与样式资源固定到本仓库 Raw 副本，降低第三方供应链漂移风险。
+
+Raw 安装地址：
+
+<https://raw.githubusercontent.com/ZJ-zhangcn/userscripts/main/ACBaiduRedirectSafe.user.js>
+
 ## License
 
 MIT
